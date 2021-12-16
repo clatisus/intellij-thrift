@@ -44,6 +44,7 @@ public interface ThriftTokenTypes {
   IElementType SERVICE_BODY = new ThriftElementType("SERVICE_BODY");
   IElementType SERVICE_SUPER_NAME = new ThriftElementType("SERVICE_SUPER_NAME");
   IElementType SET_TYPE = new ThriftElementType("SET_TYPE");
+  IElementType SIMPLE_AIRBNB_TYPE = new ThriftElementType("SIMPLE_AIRBNB_TYPE");
   IElementType SIMPLE_BASE_TYPE = new ThriftElementType("SIMPLE_BASE_TYPE");
   IElementType STRUCT = new ThriftElementType("STRUCT");
   IElementType THROWS = new ThriftElementType("THROWS");
@@ -188,6 +189,9 @@ public interface ThriftTokenTypes {
       }
       else if (type == SET_TYPE) {
         return new ThriftSetTypeImpl(node);
+      }
+      else if (type == SIMPLE_AIRBNB_TYPE) {
+        return new ThriftSimpleAirbnbTypeImpl(node);
       }
       else if (type == SIMPLE_BASE_TYPE) {
         return new ThriftSimpleBaseTypeImpl(node);

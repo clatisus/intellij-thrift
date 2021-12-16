@@ -129,6 +129,10 @@ public class ThriftVisitor extends PsiElementVisitor {
     visitPsiCompositeElement(o);
   }
 
+  public void visitSimpleAirbnbType(@NotNull ThriftSimpleAirbnbType o) {
+    visitPsiCompositeElement(o);
+  }
+
   public void visitSimpleBaseType(@NotNull ThriftSimpleBaseType o) {
     visitPsiCompositeElement(o);
   }
