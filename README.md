@@ -1,4 +1,4 @@
-[![Build Status](https://api.cirrus-ci.com/github/fkorotkov/intellij-thrift.svg)](https://cirrus-ci.com/github/fkorotkov/intellij-thrift)
+[![Build Status](https://api.cirrus-ci.com/github/clatisus/intellij-thrift.svg)](https://cirrus-ci.com/github/clatisus/intellij-thrift)
 
 Plugin to support Thrift language in IntelliJ
 
