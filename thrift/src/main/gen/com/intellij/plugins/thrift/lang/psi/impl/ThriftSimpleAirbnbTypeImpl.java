@@ -11,26 +11,20 @@ import static com.intellij.plugins.thrift.lang.lexer.ThriftTokenTypes.*;
 import com.intellij.plugins.thrift.lang.psi.*;
 import com.intellij.plugins.thrift.util.ThriftPsiUtil;
 
-public class ThriftSimpleBaseTypeImpl extends ThriftPsiCompositeElementImpl implements ThriftSimpleBaseType {
+public class ThriftSimpleAirbnbTypeImpl extends ThriftPsiCompositeElementImpl implements ThriftSimpleAirbnbType {
 
-  public ThriftSimpleBaseTypeImpl(@NotNull ASTNode node) {
+  public ThriftSimpleAirbnbTypeImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull ThriftVisitor visitor) {
-    visitor.visitSimpleBaseType(this);
+    visitor.visitSimpleAirbnbType(this);
   }
 
   @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ThriftVisitor) accept((ThriftVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public ThriftSimpleAirbnbType getSimpleAirbnbType() {
-    return findChildByClass(ThriftSimpleAirbnbType.class);
   }
 
 }

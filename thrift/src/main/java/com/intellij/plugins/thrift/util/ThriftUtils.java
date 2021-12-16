@@ -3,6 +3,8 @@ package com.intellij.plugins.thrift.util;
 import com.intellij.util.containers.ContainerUtil;
 
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by fkorotkov.
@@ -20,7 +22,14 @@ public class ThriftUtils {
           "javame", "json", "netstd", "nodejs", "nodets", "ocaml", "swift", "ts", "xml"
   );
 
-  public static Set<String> getKeywords() {
-    return keywords;
-  }
+    private static final Set<String> keywordsWithAirbnb =
+            Stream.concat(
+                    keywords.stream(),
+                    ContainerUtil.immutableSet(
+                            "date_time", "date", "json_object", "id").stream()
+            ).collect(Collectors.toSet());
+
+    public static Set<String> getKeywords() {
+       return keywordsWithAirbnb;
+    }
 }

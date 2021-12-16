@@ -5,9 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ThriftSimpleBaseType extends ThriftPsiCompositeElement {
-
-  @Nullable
-  ThriftSimpleAirbnbType getSimpleAirbnbType();
+public interface ThriftSimpleAirbnbType extends ThriftPsiCompositeElement {
 
 }
