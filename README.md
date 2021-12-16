@@ -5,13 +5,14 @@ Plugin to support Thrift language in IntelliJ
 How to build
 ===============
 
-```bahs
+```bash
+export JAVA_HOME=`/usr/libexec/java_home -v 11`
 ./gradlew :thrift:buildPlugin
 ```
 
 How to run locally with new changes
 ===============
 
-```bahs
+```bash
 ./gradlew :thrift:runIde
 ```
