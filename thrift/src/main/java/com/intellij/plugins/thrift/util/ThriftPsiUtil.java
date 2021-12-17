@@ -4,7 +4,6 @@ import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.navigation.ChooseByNameRegistry;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
@@ -26,12 +25,31 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by fkorotkov.
  */
 public class ThriftPsiUtil {
+  private static final String DEPRECATED_ANNOTATION = "deprecated";
+
+  public static boolean isAnnotatedDeprecated(@Nullable ThriftField field) {
+    List<String> annotations =
+      Optional.ofNullable(field)
+        .map(ThriftField::getTypeAnnotations)
+        .map(ThriftTypeAnnotations::getTypeAnnotationList)
+        .map(ThriftTypeAnnotationList::getTypeAnnotationList)
+        .orElse(Collections.emptyList())
+        .stream()
+        .map(ThriftTypeAnnotation::getIdentifier)
+        .map(PsiElement::getText)
+        .collect(Collectors.toList());
+    return annotations.contains(DEPRECATED_ANNOTATION);
+  }
+
   @Nullable
   public static PsiFile resolveInclude(@Nullable ThriftInclude include) {
     if (include == null) {
@@ -39,7 +57,7 @@ public class ThriftPsiUtil {
     }
     final PsiFileSystemItem target = getReferenceSet(include).resolve();
     if (target instanceof PsiFile) {
-      return (PsiFile)target;
+      return (PsiFile) target;
     }
     // check current dir
     PsiFile psiFile = include.getContainingFile();
@@ -60,12 +78,7 @@ public class ThriftPsiUtil {
         PathUtil.getFileName(includePath),
         GlobalSearchScope.allScope(include.getProject())
       ),
-      new Condition<VirtualFile>() {
-        @Override
-        public boolean value(VirtualFile file) {
-          return file.getPath().endsWith(includePath);
-        }
-      }
+      file -> file.getPath().endsWith(includePath)
     );
 
     return includedVirtualFile != null ? include.getManager().findFile(includedVirtualFile) : null;
@@ -97,8 +110,7 @@ public class ThriftPsiUtil {
     int index = text.lastIndexOf(".");
     if (index == -1) {
       return new PsiReference[]{new ThriftTypeReference(type, 0)};
-    }
-    else {
+    } else {
       return new PsiReference[]{
         new ThriftPrefixReference(type, index),
         new ThriftTypeReference(type, index + 1)
@@ -111,15 +123,12 @@ public class ThriftPsiUtil {
     if (containingFile == null) {
       return null;
     }
-    final Ref<ThriftDefinitionName> result = new Ref<ThriftDefinitionName>();
-    processDeclarations(containingFile, new Processor<ThriftDeclaration>() {
-      @Override
-      public boolean process(ThriftDeclaration declaration) {
-        if (name.equals(declaration.getName())) {
-          result.set(declaration.getIdentifier());
-        }
-        return true;
+    final Ref<ThriftDefinitionName> result = new Ref<>();
+    processDeclarations(containingFile, declaration -> {
+      if (name.equals(declaration.getName())) {
+        result.set(declaration.getIdentifier());
       }
+      return true;
     });
     return result.get();
   }
@@ -130,17 +139,14 @@ public class ThriftPsiUtil {
 
   @Nullable
   public static ThriftInclude findImportByPrefix(@NotNull PsiFile psiFile, @NotNull final String fileName) {
-    final Ref<ThriftInclude> result = new Ref<ThriftInclude>();
-    processIncludes(psiFile, new Processor<ThriftInclude>() {
-      @Override
-      public boolean process(ThriftInclude include) {
-        String path = include.getPath();
-        if (FileUtil.getNameWithoutExtension(new File(path)).equals(fileName)) {
-          result.set(include);
-          return false;
-        }
-        return true;
+    final Ref<ThriftInclude> result = new Ref<>();
+    processIncludes(psiFile, include -> {
+      String path = include.getPath();
+      if (FileUtil.getNameWithoutExtension(new File(path)).equals(fileName)) {
+        result.set(include);
+        return false;
       }
+      return true;
     });
     return result.get();
   }
@@ -154,7 +160,7 @@ public class ThriftPsiUtil {
       return;
     }
     for (PsiElement child : psiFile.getChildren()) {
-      if (clazz.isInstance(child) && !processor.process((T)child)) {
+      if (clazz.isInstance(child) && !processor.process((T) child)) {
         break;
       }
     }
@@ -162,13 +168,10 @@ public class ThriftPsiUtil {
 
   @NotNull
   public static List<NavigatablePsiElement> findImplementations(ThriftDefinitionName definitionName) {
-    final List<NavigatablePsiElement> implementations = new ArrayList<NavigatablePsiElement>();
-    processImplementations(definitionName, new Processor<NavigatablePsiElement>() {
-      @Override
-      public boolean process(NavigatablePsiElement element) {
-        implementations.add(element);
-        return true;
-      }
+    final List<NavigatablePsiElement> implementations = new ArrayList<>();
+    processImplementations(definitionName, element -> {
+      implementations.add(element);
+      return true;
     });
     return implementations;
   }
@@ -178,7 +181,7 @@ public class ThriftPsiUtil {
     for (ChooseByNameContributor contributor : ChooseByNameRegistry.getInstance().getClassModelContributors()) {
       if (!(contributor instanceof ThriftClassContributor)) {
         for (NavigationItem navigationItem : contributor.getItemsByName(name, name, definitionName.getProject(), false)) {
-          if (navigationItem instanceof NavigatablePsiElement && !processor.process((NavigatablePsiElement)navigationItem)) {
+          if (navigationItem instanceof NavigatablePsiElement && !processor.process((NavigatablePsiElement) navigationItem)) {
             return;
           }
         }
@@ -190,7 +193,7 @@ public class ThriftPsiUtil {
   public static PsiElement setName(@NotNull ThriftDefinitionName definitionName, String name) {
     PsiElement child = definitionName.getFirstChild();
     if (child instanceof LeafPsiElement) {
-      ((LeafPsiElement)child).replaceWithText(name);
+      ((LeafPsiElement) child).replaceWithText(name);
     }
     return definitionName;
   }

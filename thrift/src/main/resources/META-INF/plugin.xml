@@ -65,6 +65,10 @@
                      key="thrift.inspection.unresolved.include"
                      groupKey="inspections.group.name" enabledByDefault="true"
                      implementationClass="com.intellij.plugins.thrift.inspections.ThriftUnresolvedIncludeInspection"/>
+    <localInspection language="thrift" shortName="ThriftDeprecatedAnnotation" bundle="ThriftBundle"
+                     key="thrift.inspection.deprecated"
+                     groupKey="inspections.group.name" enabledByDefault="true"
+                     implementationClass="com.intellij.plugins.thrift.inspections.ThriftDeprecatedAnnotationInspection"/>
     <localInspection language="thrift" shortName="ThriftTopLevelDeclarationDuplicates" bundle="ThriftBundle"
                      key="thrift.inspection.duplicates.top_level_declaration"
                      groupKey="inspections.group.name" enabledByDefault="true"
