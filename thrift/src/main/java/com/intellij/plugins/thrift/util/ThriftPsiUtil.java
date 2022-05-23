@@ -37,8 +37,7 @@ public class ThriftPsiUtil {
   private static final String DEPRECATED_ANNOTATION = "deprecated";
 
   public static boolean isAnnotatedDeprecated(@Nullable ThriftField field) {
-    List<String> annotations =
-      Optional.ofNullable(field)
+    List<String> annotations = Optional.ofNullable(field)
         .map(ThriftField::getTypeAnnotations)
         .map(ThriftTypeAnnotations::getTypeAnnotationList)
         .map(ThriftTypeAnnotationList::getTypeAnnotationList)
@@ -71,15 +70,11 @@ public class ThriftPsiUtil {
       return fileInDir;
     }
 
-
     final VirtualFile includedVirtualFile = ContainerUtil.find(
-      FilenameIndex.getVirtualFilesByName(
-        include.getProject(),
-        PathUtil.getFileName(includePath),
-        GlobalSearchScope.allScope(include.getProject())
-      ),
-      file -> file.getPath().endsWith(includePath)
-    );
+        FilenameIndex.getVirtualFilesByName(
+            PathUtil.getFileName(includePath),
+            GlobalSearchScope.allScope(include.getProject())),
+        file -> file.getPath().endsWith(includePath));
 
     return includedVirtualFile != null ? include.getManager().findFile(includedVirtualFile) : null;
   }
@@ -94,8 +89,8 @@ public class ThriftPsiUtil {
     final PsiElement element = include.getLastChild();
     final String path = getPath(include);
     return new FileReferenceSet(
-      path, include, element.getStartOffsetInParent() + 1, null, true, true, new FileType[]{ThriftFileType.INSTANCE}
-    );
+        path, include, element.getStartOffsetInParent() + 1, null, true, true,
+        new FileType[] { ThriftFileType.INSTANCE });
   }
 
   @NotNull
@@ -109,11 +104,11 @@ public class ThriftPsiUtil {
     String text = type.getText();
     int index = text.lastIndexOf(".");
     if (index == -1) {
-      return new PsiReference[]{new ThriftTypeReference(type, 0)};
+      return new PsiReference[] { new ThriftTypeReference(type, 0) };
     } else {
-      return new PsiReference[]{
-        new ThriftPrefixReference(type, index),
-        new ThriftTypeReference(type, index + 1)
+      return new PsiReference[] {
+          new ThriftPrefixReference(type, index),
+          new ThriftTypeReference(type, index + 1)
       };
     }
   }
@@ -155,7 +150,8 @@ public class ThriftPsiUtil {
     processElements(psiFile, processor, ThriftInclude.class);
   }
 
-  public static <T> void processElements(@Nullable PsiFile psiFile, @NotNull Processor<T> processor, Class<? extends T> clazz) {
+  public static <T> void processElements(@Nullable PsiFile psiFile, @NotNull Processor<T> processor,
+      Class<? extends T> clazz) {
     if (psiFile == null) {
       return;
     }
@@ -176,12 +172,15 @@ public class ThriftPsiUtil {
     return implementations;
   }
 
-  public static void processImplementations(ThriftDefinitionName definitionName, @NotNull Processor<NavigatablePsiElement> processor) {
+  public static void processImplementations(ThriftDefinitionName definitionName,
+      @NotNull Processor<NavigatablePsiElement> processor) {
     String name = definitionName.getText();
     for (ChooseByNameContributor contributor : ChooseByNameRegistry.getInstance().getClassModelContributors()) {
       if (!(contributor instanceof ThriftClassContributor)) {
-        for (NavigationItem navigationItem : contributor.getItemsByName(name, name, definitionName.getProject(), false)) {
-          if (navigationItem instanceof NavigatablePsiElement && !processor.process((NavigatablePsiElement) navigationItem)) {
+        for (NavigationItem navigationItem : contributor.getItemsByName(name, name, definitionName.getProject(),
+            false)) {
+          if (navigationItem instanceof NavigatablePsiElement
+              && !processor.process((NavigatablePsiElement) navigationItem)) {
             return;
           }
         }
